@@ -1,0 +1,654 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --cream: oklch(97% 0.012 85);
+  --stone: oklch(38% 0.015 70);
+  --accent: oklch(62% 0.055 220);
+  --accent-light: oklch(92% 0.03 220);
+  --gold: oklch(72% 0.08 80);
+  --text: oklch(28% 0.01 70);
+  --muted: oklch(58% 0.012 70);
+  --border: oklch(88% 0.012 85);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  font-weight: 300;
+  overflow-x: hidden;
+}
+
+/* ── NAV ────────────────────────────────────────────────────── */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  gap: 2.5rem;
+  padding: 1.25rem 2rem;
+  transition: background 0.4s, backdrop-filter 0.4s;
+}
+
+.nav.scrolled {
+  background: oklch(97% 0.012 85 / 0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav a {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: white;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.nav.scrolled a {
+  color: var(--stone);
+}
+
+.nav a:hover {
+  opacity: 0.6;
+}
+
+/* ── HERO ───────────────────────────────────────────────────── */
+.hero {
+  position: relative;
+  height: 100vh;
+  min-height: 600px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    oklch(0% 0 0 / 0.08) 0%,
+    oklch(0% 0 0 / 0.0) 40%,
+    oklch(0% 0 0 / 0.45) 100%
+  );
+}
+
+.hero-content {
+  position: relative;
+  text-align: center;
+  color: white;
+  padding: 0 1.5rem 5rem;
+}
+
+.hero-eyebrow {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.85;
+  margin-bottom: 1rem;
+}
+
+.hero-names {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(3.5rem, 9vw, 7rem);
+  font-weight: 300;
+  line-height: 1;
+  margin-bottom: 1.25rem;
+  text-shadow: 0 2px 20px oklch(0% 0 0 / 0.2);
+}
+
+.hero-names em {
+  font-style: italic;
+  font-weight: 300;
+}
+
+.hero-date {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.88;
+}
+
+.scroll-hint {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: white;
+  opacity: 0.6;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+.scroll-line {
+  width: 1px;
+  height: 40px;
+  background: white;
+  opacity: 0.5;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(6px); }
+}
+
+/* ── SECTIONS ───────────────────────────────────────────────── */
+.section {
+  padding: 6rem 1.5rem;
+}
+
+.section-inner {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.section-inner.wide {
+  max-width: 900px;
+}
+
+.section-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1.25rem;
+}
+
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 300;
+  line-height: 1.15;
+  color: var(--text);
+  margin-bottom: 2rem;
+}
+
+.section-title em {
+  font-style: italic;
+}
+
+.divider {
+  width: 48px;
+  height: 1px;
+  background: var(--accent);
+  margin: 0 0 2.5rem;
+}
+
+/* ── COUNTDOWN ──────────────────────────────────────────────── */
+.countdown-section {
+  background: var(--text);
+  color: white;
+  padding: 4rem 1.5rem;
+  text-align: center;
+}
+
+.countdown-eyebrow {
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.45;
+  margin-bottom: 2rem;
+}
+
+.countdown-grid {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  flex-wrap: wrap;
+}
+
+.countdown-item {
+  text-align: center;
+}
+
+.countdown-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 4rem;
+  font-weight: 300;
+  line-height: 1;
+  display: block;
+}
+
+.countdown-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  margin-top: 0.5rem;
+  display: block;
+}
+
+/* ── CEREMONY ───────────────────────────────────────────────── */
+.ceremony-section {
+  background: white;
+}
+
+.ceremony-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.ceremony-row {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.ceremony-row-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  padding-top: 2px;
+}
+
+.ceremony-row-value {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.ceremony-row-value.muted {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 300;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.ceremony-divider {
+  width: 100%;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── PHOTO BREAK ────────────────────────────────────────────── */
+.photo-break {
+  overflow: hidden;
+  min-height: 320px;
+}
+
+.photo-break img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ── SCHEDULE ───────────────────────────────────────────────── */
+.schedule-section {
+  background: white;
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+}
+
+.timeline-item {
+  display: grid;
+  grid-template-columns: 100px 1px 1fr;
+  gap: 0 1.5rem;
+  padding: 1.75rem 0;
+}
+
+.timeline-item:not(:last-child) .tl-line {
+  background: linear-gradient(to bottom, var(--accent), var(--border));
+}
+
+.tl-time {
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  text-align: right;
+  padding-top: 0.2rem;
+}
+
+.tl-line {
+  background: var(--border);
+  position: relative;
+}
+
+.tl-dot {
+  position: absolute;
+  top: 0.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid white;
+  outline: 1px solid var(--accent);
+}
+
+.tl-body {
+  padding-bottom: 0.25rem;
+}
+
+.tl-event {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  font-weight: 400;
+  color: var(--text);
+  margin-bottom: 0.25rem;
+}
+
+.tl-detail {
+  font-size: 0.8rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* ── TRAVEL ─────────────────────────────────────────────────── */
+.travel-section {
+  background: var(--accent-light);
+}
+
+.travel-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin-top: 2rem;
+}
+
+.travel-card {
+  background: white;
+  border-radius: 4px;
+  padding: 2rem;
+  border: 1px solid var(--border);
+}
+
+.travel-card-icon {
+  width: 36px;
+  height: 36px;
+  margin-bottom: 1rem;
+  color: var(--accent);
+}
+
+.travel-card h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.35rem;
+  font-weight: 400;
+  margin-bottom: 0.6rem;
+}
+
+.travel-card p {
+  font-size: 0.83rem;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+/* ── DAY 2 ──────────────────────────────────────────────────── */
+.day2-section {
+  background: var(--cream);
+}
+
+/* ── RSVP ───────────────────────────────────────────────────── */
+.rsvp-section {
+  background: var(--text);
+  color: white;
+}
+
+.rsvp-section .section-label {
+  color: var(--gold);
+}
+
+.rsvp-section .section-title {
+  color: white;
+}
+
+.rsvp-section .divider {
+  background: var(--gold);
+}
+
+.rsvp-deadline {
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  opacity: 0.5;
+  margin-bottom: 2.5rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 0.6rem;
+  opacity: 0.65;
+  color: white;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  background: oklch(100% 0 0 / 0.07);
+  border: 1px solid oklch(100% 0 0 / 0.15);
+  border-radius: 3px;
+  padding: 0.85rem 1rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 300;
+  color: white;
+  transition: border-color 0.2s;
+  outline: none;
+  appearance: none;
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+  opacity: 0.35;
+  color: white;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  border-color: oklch(72% 0.08 80 / 0.6);
+}
+
+.form-select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='white' stroke-opacity='0.5' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 12px;
+  padding-right: 2.5rem;
+}
+
+.form-select option {
+  background: var(--text);
+  color: white;
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+.attendance-toggle {
+  display: flex;
+  border: 1px solid oklch(100% 0 0 / 0.15);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.att-btn {
+  flex: 1;
+  padding: 0.85rem 1rem;
+  background: transparent;
+  border: none;
+  color: oklch(100% 0 0 / 0.4);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.att-btn:first-child {
+  border-right: 1px solid oklch(100% 0 0 / 0.15);
+}
+
+.att-btn.active {
+  background: oklch(72% 0.08 80 / 0.2);
+  color: oklch(85% 0.07 80);
+}
+
+.form-error {
+  font-size: 0.75rem;
+  color: oklch(75% 0.12 30);
+  margin-top: 0.4rem;
+  letter-spacing: 0.05em;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 1.1rem;
+  background: var(--gold);
+  border: none;
+  border-radius: 3px;
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+  margin-top: 0.5rem;
+}
+
+.submit-btn:hover:not(:disabled) {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+.submit-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.submit-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.rsvp-success {
+  text-align: center;
+  padding: 3rem 0;
+}
+
+.rsvp-success-heading {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3rem;
+  font-weight: 300;
+  font-style: italic;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.rsvp-success-body {
+  opacity: 0.5;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  color: white;
+}
+
+.rsvp-submit-error {
+  font-size: 0.82rem;
+  color: oklch(75% 0.12 30);
+  margin-top: 1rem;
+  text-align: center;
+  letter-spacing: 0.05em;
+}
+
+/* ── FOOTER ─────────────────────────────────────────────────── */
+.footer {
+  padding: 3rem 1.5rem;
+  text-align: center;
+  background: oklch(22% 0.01 70);
+  color: oklch(100% 0 0 / 0.3);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+}
+
+.footer-names {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  font-style: italic;
+  opacity: 0.5;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+/* ── MOBILE ─────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .nav {
+    gap: 1rem;
+    padding: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .section {
+    padding: 4rem 1.25rem;
+  }
+
+  .countdown-grid {
+    gap: 2rem;
+  }
+
+  .ceremony-row {
+    grid-template-columns: 80px 1fr;
+  }
+
+  .timeline-item {
+    grid-template-columns: 70px 1px 1fr;
+  }
+
+  .travel-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .rsvp-success-heading {
+    font-size: 2.2rem;
+  }
+}
