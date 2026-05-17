@@ -2,12 +2,16 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { createClient } from '@supabase/supabase-js'
 
-// Supabase client — publishable key is safe to expose in frontend.
-// RLS policy allows inserts but blocks all reads.
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
-)
+// Lazy getter — only creates the client when first needed (on submit).
+// This prevents a missing env var from crashing the entire page on load.
+function getSupabase() {
+  const url = import.meta.env.VITE_SUPABASE_URL
+  const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+  if (!url || !key) {
+    throw new Error('Supabase env vars are not configured.')
+  }
+  return createClient(url, key)
+}
 
 export default function Rsvp() {
   // Attendance state lives outside react-hook-form so the toggle always
@@ -28,16 +32,23 @@ export default function Rsvp() {
   const onSubmit = async (data) => {
     setStatus('loading')
 
-    // Enforce minimum 900ms loading feel per the design spec
-    const [result] = await Promise.all([
-      supabase.from('rsvps').insert({
-        name: data.name.trim(),
-        attending: attending === 'yes',
-        guest_count: attending === 'yes' ? parseInt(data.guest_count, 10) : null,
-        dietary: attending === 'yes' ? (data.dietary?.trim() || null) : null,
-      }),
-      new Promise((resolve) => setTimeout(resolve, 900)),
-    ])
+    let result
+    try {
+      // Enforce minimum 900ms loading feel per the design spec
+      ;[result] = await Promise.all([
+        getSupabase().from('rsvps').insert({
+          name: data.name.trim(),
+          attending: attending === 'yes',
+          guest_count: attending === 'yes' ? parseInt(data.guest_count, 10) : null,
+          dietary: attending === 'yes' ? (data.dietary?.trim() || null) : null,
+        }),
+        new Promise((resolve) => setTimeout(resolve, 900)),
+      ])
+    } catch (err) {
+      console.error('Supabase setup error:', err)
+      setStatus('error')
+      return
+    }
 
     if (result.error) {
       console.error('RSVP insert error:', result.error)
