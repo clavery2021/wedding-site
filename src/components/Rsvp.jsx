@@ -14,33 +14,42 @@ function getSupabase() {
 }
 
 export default function Rsvp() {
-  // Attendance state lives outside react-hook-form so the toggle always
-  // has a clear source of truth and never gets stale after form resets.
   const [attending, setAttending] = useState('yes')
   const [status, setStatus] = useState('idle') // 'idle' | 'loading' | 'success' | 'error'
 
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm({
-    // When conditional fields unmount they are removed from the form values,
-    // so their stale values are never included in the submission payload.
     shouldUnregister: true,
+    defaultValues: { guest_count: '1' },
   })
+
+  // Watch guest count so name/dietary fields render dynamically
+  const guestCount = parseInt(watch('guest_count') ?? '1', 10)
 
   const onSubmit = async (data) => {
     setStatus('loading')
 
+    const count = parseInt(data.guest_count, 10)
+
+    // Build a guest array — dietary only included when attending
+    const guests = Array.from({ length: count }, (_, i) => ({
+      name: data.guests?.[i]?.name?.trim() ?? '',
+      ...(attending === 'yes' && {
+        dietary: data.guests?.[i]?.dietary?.trim() || null,
+      }),
+    }))
+
     let result
     try {
-      // Enforce minimum 900ms loading feel per the design spec
       ;[result] = await Promise.all([
         getSupabase().from('rsvps').insert({
-          name: data.name.trim(),
           attending: attending === 'yes',
-          guest_count: attending === 'yes' ? parseInt(data.guest_count, 10) : null,
-          dietary: attending === 'yes' ? (data.dietary?.trim() || null) : null,
+          guest_count: count,
+          guests,
         }),
         new Promise((resolve) => setTimeout(resolve, 900)),
       ])
@@ -87,9 +96,14 @@ export default function Rsvp() {
           Kindly <em>Reply</em>
         </h2>
         <div className="divider" />
+
+        <p className="rsvp-intro">
+          Please fill out the following RSVP for each guest on your invitation.
+        </p>
         <p className="rsvp-deadline">Please respond by 1st August 2026</p>
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
+
           {/* ── Attendance toggle ── */}
           <div className="form-group">
             <label className="form-label">Will you be joining us?</label>
@@ -111,68 +125,76 @@ export default function Rsvp() {
             </div>
           </div>
 
-          {/* ── Full name — always required ── */}
+          {/* ── Number of guests — shown for both attending states ── */}
           <div className="form-group">
-            <label className="form-label" htmlFor="rsvp-name">
-              Full Name
+            <label className="form-label" htmlFor="rsvp-guest-count">
+              Number of Guests
             </label>
-            <input
-              id="rsvp-name"
-              className="form-input"
-              type="text"
-              placeholder="Your name"
-              autoComplete="name"
-              {...register('name', {
-                required: 'Please enter your name',
-                validate: (v) =>
-                  v.trim().length > 0 || 'Please enter your name',
-              })}
-            />
-            {errors.name && (
-              <p className="form-error">{errors.name.message}</p>
-            )}
+            <select
+              id="rsvp-guest-count"
+              className="form-select"
+              {...register('guest_count')}
+            >
+              <option value="1">1 guest</option>
+              <option value="2">2 guests</option>
+              <option value="3">3 guests</option>
+              <option value="4">4 guests</option>
+            </select>
           </div>
 
-          {/* ── Conditional fields — only shown when attending ── */}
-          {attending === 'yes' && (
-            <>
-              <div className="form-group">
-                <label className="form-label" htmlFor="rsvp-guests">
-                  Number of Guests
-                </label>
-                <select
-                  id="rsvp-guests"
-                  className="form-select"
-                  {...register('guest_count', { required: true })}
-                  defaultValue="1"
-                >
-                  <option value="1">1 guest</option>
-                  <option value="2">2 guests</option>
-                  <option value="3">3 guests</option>
-                  <option value="4">4 guests</option>
-                </select>
-              </div>
+          {/* ── Per-guest fields ── */}
+          {Array.from({ length: guestCount }, (_, i) => (
+            <div className="guest-block" key={i}>
+              {guestCount > 1 && (
+                <p className="guest-block-label">Guest {i + 1}</p>
+              )}
 
               <div className="form-group">
-                <label className="form-label" htmlFor="rsvp-dietary">
-                  Dietary Requirements
+                <label className="form-label" htmlFor={`guest-name-${i}`}>
+                  {guestCount === 1 ? 'Full Name' : `Guest ${i + 1} Name`}
                 </label>
-                <textarea
-                  id="rsvp-dietary"
-                  className="form-textarea"
-                  placeholder="Any allergies or dietary needs? Leave blank if none."
-                  {...register('dietary')}
+                <input
+                  id={`guest-name-${i}`}
+                  className="form-input"
+                  type="text"
+                  placeholder="Full name"
+                  autoComplete={i === 0 ? 'name' : 'off'}
+                  {...register(`guests.${i}.name`, {
+                    required: 'Please enter a name',
+                    validate: (v) =>
+                      (v && v.trim().length > 0) || 'Please enter a name',
+                  })}
                 />
+                {errors.guests?.[i]?.name && (
+                  <p className="form-error">{errors.guests[i].name.message}</p>
+                )}
               </div>
-            </>
-          )}
+
+              {/* Dietary only shown when attending */}
+              {attending === 'yes' && (
+                <div className="form-group">
+                  <label className="form-label" htmlFor={`guest-dietary-${i}`}>
+                    {guestCount === 1
+                      ? 'Dietary Requirements'
+                      : `Guest ${i + 1} Dietary Requirements`}
+                  </label>
+                  <textarea
+                    id={`guest-dietary-${i}`}
+                    className="form-textarea"
+                    placeholder="Any allergies or dietary needs? Leave blank if none."
+                    {...register(`guests.${i}.dietary`)}
+                  />
+                </div>
+              )}
+            </div>
+          ))}
 
           <button
             type="submit"
             className="submit-btn"
             disabled={status === 'loading'}
           >
-            {status === 'loading' ? 'Sending\u2026' : 'Send RSVP'}
+            {status === 'loading' ? 'Sending…' : 'Send RSVP'}
           </button>
 
           {status === 'error' && (
