@@ -2,15 +2,18 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { createClient } from '@supabase/supabase-js'
 
-// Lazy getter — only creates the client when first needed (on submit).
-// This prevents a missing env var from crashing the entire page on load.
+// Singleton — created once on first call, reused after that.
+// Lazy so a missing env var doesn't crash the page on load.
+let _supabase = null
 function getSupabase() {
+  if (_supabase) return _supabase
   const url = import.meta.env.VITE_SUPABASE_URL
   const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
-  if (!url || !key) {
+  if (!url || !key || url.includes('your-project')) {
     throw new Error('Supabase env vars are not configured.')
   }
-  return createClient(url, key)
+  _supabase = createClient(url, key)
+  return _supabase
 }
 
 export default function Rsvp() {
